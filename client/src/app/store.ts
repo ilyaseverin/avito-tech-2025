@@ -1,16 +1,19 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { itemsApi } from "./api/api";
-// Пример: если есть authSlice
-// import authReducer from '../features/auth/authSlice';
+import { authApi } from "./api/authApi";
+import authReducer from "../features/auth/authSlice";
 
 export const store = configureStore({
   reducer: {
-    // auth: authReducer,
+    auth: authReducer,
     [itemsApi.reducerPath]: itemsApi.reducer,
+    [authApi.reducerPath]: authApi.reducer,
   },
   // Для RTK Query нужно добавить middleware
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(itemsApi.middleware),
+    getDefaultMiddleware()
+      .concat(itemsApi.middleware)
+      .concat(authApi.middleware),
 });
 
 // Типы для дальнейшего использования

@@ -1,5 +1,3 @@
-// src/features/items/components/ItemDetails.tsx
-
 import React from "react";
 import { Item } from "../../../types/itemTypes";
 import { Box, Container, Grid2, Typography } from "@mui/material";
@@ -35,7 +33,10 @@ export const ItemDetails: React.FC<ItemDetailsProps> = ({ item }) => {
                 alt={item.name}
                 sx={{
                   width: "100%",
+                  maxWidth: "400px",
                   height: "auto",
+                  maxHeight: "calc(100vh - 400px)",
+                  objectFit: "contain",
                   borderRadius: 2,
                   boxShadow: 3,
                 }}
@@ -44,11 +45,19 @@ export const ItemDetails: React.FC<ItemDetailsProps> = ({ item }) => {
               <Box
                 sx={{
                   width: "100%",
-                  height: 400,
+                  maxWidth: "400px",
+                  height: "300px",
                   backgroundColor: "#ccc",
                   borderRadius: 2,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
-              />
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Нет изображения
+                </Typography>
+              </Box>
             )}
           </Grid2>
 

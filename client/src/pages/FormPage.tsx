@@ -147,10 +147,10 @@ export const FormPage: React.FC = () => {
 
       <Stepper activeStep={activeStep} style={{ marginBottom: 16 }}>
         <Step>
-          <StepLabel>Основные поля</StepLabel>
+          <StepLabel>Шаг 1</StepLabel>
         </Step>
         <Step>
-          <StepLabel>Поля категории</StepLabel>
+          <StepLabel>Шаг 2</StepLabel>
         </Step>
       </Stepper>
 

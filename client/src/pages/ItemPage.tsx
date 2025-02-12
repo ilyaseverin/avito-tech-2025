@@ -1,5 +1,3 @@
-// src/pages/ItemPage.tsx
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetItemByIdQuery, useDeleteItemMutation } from "../app/api/api";
@@ -13,6 +11,7 @@ import {
   Box,
 } from "@mui/material";
 import { ItemDetails } from "../features/items/components/ItemDetails";
+import { useAppSelector } from "../hooks/hooks";
 
 export const ItemPage: React.FC = () => {
   const { id } = useParams();
@@ -22,6 +21,8 @@ export const ItemPage: React.FC = () => {
 
   // Запрашиваем данные объявления
   const { data: item, isLoading, error } = useGetItemByIdQuery(itemId);
+
+  const token = useAppSelector((state) => state.auth.token);
 
   // Мутация на удаление
   const [deleteItem] = useDeleteItemMutation();
@@ -82,35 +83,37 @@ export const ItemPage: React.FC = () => {
       {/* Детали объявления */}
       <ItemDetails item={item} />
 
-      {/* Кнопки управления, центрированные с помощью Box */}
-      <Box
-        sx={{
-          maxWidth: 600,
-          mx: "auto",
-          p: 2,
-          display: "flex",
-          justifyContent: "center",
-          gap: 2,
-          flexWrap: "wrap",
-        }}
-      >
-        <Button
-          variant="contained"
-          onClick={() => navigate(`/form/${item.id}`)}
+      {/* Кнопки управления (доступны только если авторизован) */}
+      {token && (
+        <Box
+          sx={{
+            maxWidth: 600,
+            mx: "auto",
+            p: 2,
+            display: "flex",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
         >
-          Редактировать
-        </Button>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={handleOpenDeleteConfirm}
-        >
-          Удалить
-        </Button>
-        <Button variant="outlined" onClick={handleGoBack}>
-          Назад
-        </Button>
-      </Box>
+          <Button
+            variant="contained"
+            onClick={() => navigate(`/form/${item.id}`)}
+          >
+            Редактировать
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleOpenDeleteConfirm}
+          >
+            Удалить
+          </Button>
+          <Button variant="outlined" onClick={handleGoBack}>
+            Назад
+          </Button>
+        </Box>
+      )}
 
       {/* Модальное окно подтверждения удаления */}
       <Dialog open={confirmDeleteOpen} onClose={handleCloseDeleteConfirm}>

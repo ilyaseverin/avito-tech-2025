@@ -1,5 +1,3 @@
-// src/pages/ListPage.tsx
-
 import React, { useState } from "react";
 import { useGetItemsQuery } from "../app/api/api";
 import {
@@ -23,10 +21,11 @@ import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied
 import { ItemCard } from "../features/items/components/ItemCard";
 import { Item } from "../types/itemTypes";
 import { useDebounce } from "../hooks/useDebounce";
+import { useAppSelector } from "../hooks/hooks";
 
 export const ListPage: React.FC = () => {
   const { data: items = [], isLoading, error } = useGetItemsQuery();
-
+  const token = useAppSelector((state) => state.auth.token);
   // Поиск
   const [search, setSearch] = useState("");
   // Фильтр категории
@@ -34,7 +33,6 @@ export const ListPage: React.FC = () => {
   // Текущая страница
   const [page, setPage] = useState(1);
 
-  // Используем свой хук для debounce
   const debouncedSearch = useDebounce(search, 500);
 
   // Фильтруем items по поиску и категории
@@ -80,19 +78,32 @@ export const ListPage: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Список объявлений
       </Typography>
-
       <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={2}
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 2,
+          my: 4,
+        }}
       >
-        <Button variant="contained" href="/form">
-          Разместить объявление
-        </Button>
+        {/* Если есть token, отображаем кнопку */}
+        {token && (
+          <Button variant="contained" href="/form">
+            Разместить объявление
+          </Button>
+        )}
 
-        {/* Поиск и фильтр */}
-        <Box display="flex" gap={2}>
+        {/* Группа для поиска и фильтра */}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            flexWrap: "wrap", // если места мало — элементы переносятся
+            justifyContent: "center",
+          }}
+        >
           <TextField
             variant="outlined"
             size="small"
@@ -127,7 +138,6 @@ export const ListPage: React.FC = () => {
           </FormControl>
         </Box>
       </Box>
-
       {/* Если нет результатов, показываем заглушку */}
       {filteredItems.length === 0 ? (
         <Paper
