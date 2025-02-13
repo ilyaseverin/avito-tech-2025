@@ -40,7 +40,9 @@ export const ListPage: React.FC = () => {
   // Фильтруем items по поиску и категории
   const filteredItems = items
     .filter((item) =>
-      item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      debouncedSearch.length >= 3
+        ? item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+        : true
     )
     .filter((item) => (category ? item.type === category : true));
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@mui/material";
+import { Button, Box, Stack } from "@mui/material";
 
 interface StepNavigationProps {
   activeStep: number;
@@ -14,24 +14,39 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
   handlePrevStep,
   handleSubmit,
 }) => (
-  <div style={{ marginTop: 16 }}>
-    {activeStep === 0 ? (
-      <Button variant="contained" onClick={handleNextStep}>
-        Далее
-      </Button>
-    ) : (
-      <>
-        <Button
-          variant="outlined"
-          onClick={handlePrevStep}
-          style={{ marginRight: 8 }}
-        >
-          Назад
+  <Box sx={{ mt: 3, display: "flex", justifyContent: "center", width: "100%" }}>
+    <Stack
+      direction="row"
+      spacing={2}
+      sx={{
+        width: "100%",
+        maxWidth: 400,
+        justifyContent: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      {activeStep === 0 ? (
+        <Button variant="contained" fullWidth onClick={handleNextStep}>
+          Далее
         </Button>
-        <Button variant="contained" onClick={handleSubmit}>
-          Сохранить
-        </Button>
-      </>
-    )}
-  </div>
+      ) : (
+        <>
+          <Button
+            variant="outlined"
+            onClick={handlePrevStep}
+            sx={{ flex: 1, minWidth: 100 }}
+          >
+            Назад
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            sx={{ flex: 1, minWidth: 100 }}
+          >
+            Сохранить
+          </Button>
+        </>
+      )}
+    </Stack>
+  </Box>
 );

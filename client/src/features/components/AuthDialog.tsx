@@ -1,41 +1,54 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  TextField,
 } from "@mui/material";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { useAppDispatch } from "../../hooks/hooks";
 import { setToken } from "../auth/authSlice";
+import { RHFTextField } from "../components/form/RHFTextField";
 
 interface AuthDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
+interface AuthFormValues {
+  username: string;
+  password: string;
+}
+
 export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onClose }) => {
   const dispatch = useAppDispatch();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const { control, handleSubmit, setError, reset } = useForm<AuthFormValues>({
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
 
-  const handleLogin = () => {
-    // Простая фейковая проверка
-    if (username === "test" && password === "1234") {
-      dispatch(setToken("fake-token")); // устанавливаем "токен"
-      onClose();
+  const onSubmit: SubmitHandler<AuthFormValues> = (data) => {
+    if (data.username === "test" && data.password === "1234") {
+      dispatch(setToken("fake-token"));
+      handleClose();
     } else {
-      setErrorMsg("Неверные логин или пароль");
+      setError("username", {
+        type: "manual",
+        message: "Неверные логин или пароль",
+      });
+      setError("password", {
+        type: "manual",
+        message: "Неверные логин или пароль",
+      });
     }
   };
 
   const handleClose = () => {
-    setUsername("");
-    setPassword("");
-    setErrorMsg("");
+    reset();
     onClose();
   };
 
@@ -43,26 +56,29 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onClose }) => {
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Вход</DialogTitle>
       <DialogContent dividers>
-        <TextField
-          label="Логин"
-          fullWidth
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{ marginBottom: 16 }}
-        />
-        <TextField
-          label="Пароль"
-          fullWidth
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ marginBottom: 16 }}
-        />
-        {errorMsg && <div style={{ color: "red" }}>{errorMsg}</div>}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <RHFTextField
+            name="username"
+            control={control}
+            label="Логин"
+            fullWidth
+            rules={{ required: "Введите логин" }}
+            style={{ marginBottom: 16 }}
+          />
+          <RHFTextField
+            name="password"
+            control={control}
+            label="Пароль"
+            type="password"
+            fullWidth
+            rules={{ required: "Введите пароль" }}
+            style={{ marginBottom: 16 }}
+          />
+        </form>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Отмена</Button>
-        <Button onClick={handleLogin} variant="contained">
+        <Button onClick={handleSubmit(onSubmit)} variant="contained">
           Войти
         </Button>
       </DialogActions>

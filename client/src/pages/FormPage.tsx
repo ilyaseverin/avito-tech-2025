@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Stepper, Step, StepLabel } from "@mui/material";
+import {
+  Stepper,
+  Step,
+  StepLabel,
+  Box,
+  Container,
+  Paper,
+  Typography,
+} from "@mui/material";
 
 import {
   useGetItemByIdQuery,
@@ -95,7 +103,7 @@ export const FormPage: React.FC = () => {
         await updateItem({ id: Number(id), data: formData }).unwrap();
       } else {
         await createItem(formData).unwrap();
-        clearDraft(); // ✅ Очищаем черновик после успешного создания
+        clearDraft();
       }
       navigate("/list");
     } catch (error) {
@@ -125,40 +133,45 @@ export const FormPage: React.FC = () => {
 
   return (
     <>
-      <div style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
-        <h2>
-          {isEditMode ? "Редактирование объявления" : "Разместить объявление"}
-        </h2>
+      <Container maxWidth="sm" sx={{ mt: 4 }}>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Typography variant="h5" component="h2" gutterBottom>
+            {isEditMode ? "Редактирование объявления" : "Разместить объявление"}
+          </Typography>
 
-        <Stepper activeStep={activeStep} style={{ marginBottom: 16 }}>
-          <Step>
-            <StepLabel>Шаг 1</StepLabel>
-          </Step>
-          <Step>
-            <StepLabel>Шаг 2</StepLabel>
-          </Step>
-        </Stepper>
+          <Box sx={{ mb: 2 }}>
+            <Stepper activeStep={activeStep}>
+              <Step>
+                <StepLabel>Шаг 1</StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>Шаг 2</StepLabel>
+              </Step>
+            </Stepper>
+          </Box>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {activeStep === 0 && (
-            <BasicFields control={control} errors={errors} />
-          )}
-          {activeStep === 1 && (
-            <CategoryFields
-              control={control}
-              errors={errors}
-              selectedType={selectedType}
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {activeStep === 0 && (
+              <BasicFields control={control} errors={errors} />
+            )}
+            {activeStep === 1 && (
+              <CategoryFields
+                control={control}
+                errors={errors}
+                selectedType={selectedType}
+              />
+            )}
+
+            <StepNavigation
+              activeStep={activeStep}
+              handleNextStep={handleNextStep}
+              handlePrevStep={handlePrevStep}
+              handleSubmit={handleSubmit(onSubmit)}
             />
-          )}
+          </form>
+        </Paper>
+      </Container>
 
-          <StepNavigation
-            activeStep={activeStep}
-            handleNextStep={handleNextStep}
-            handlePrevStep={handlePrevStep}
-            handleSubmit={handleSubmit(onSubmit)}
-          />
-        </form>
-      </div>
       <ErrorDialog
         open={errorDialogOpen}
         onClose={() => setErrorDialogOpen(false)}
