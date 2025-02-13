@@ -18,10 +18,12 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
-import { ItemCard } from "../features/items/components/ItemCard";
+import { ItemCard } from "../features/components/items/ItemCard";
 import { Item } from "../types/itemTypes";
 import { useDebounce } from "../hooks/useDebounce";
 import { useAppSelector } from "../hooks/hooks";
+import { Loader } from "../features/components/Loader";
+import { ErrorMessage } from "../features/components/ErrorMessage";
 
 export const ListPage: React.FC = () => {
   const { data: items = [], isLoading, error } = useGetItemsQuery();
@@ -49,28 +51,19 @@ export const ListPage: React.FC = () => {
   const paginatedItems = filteredItems.slice(startIndex, endIndex);
   const pageCount = Math.ceil(filteredItems.length / pageSize);
 
-  // Состояние загрузки/ошибки
   if (isLoading) {
-    return (
-      <Container maxWidth="md">
-        <Typography variant="h5" align="center" sx={{ mt: 4 }}>
-          Загрузка...
-        </Typography>
-      </Container>
-    );
+    return <Loader />;
   }
+
   if (error) {
-    return (
-      <Container maxWidth="md">
-        <Typography
-          variant="h5"
-          align="center"
-          sx={{ mt: 4, color: "error.main" }}
-        >
-          Произошла ошибка при загрузке объявлений.
-        </Typography>
-      </Container>
-    );
+    const errorMessage =
+      "Произошла ошибка при загрузке объявлений. Попробуйте позже.";
+    let errorCode: number | undefined;
+
+    if (typeof error === "object" && error !== null && "status" in error) {
+      errorCode = (error as { status: number }).status;
+    }
+    return <ErrorMessage message={errorMessage} code={errorCode} />;
   }
 
   return (

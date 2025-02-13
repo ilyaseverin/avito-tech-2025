@@ -1,49 +1,49 @@
 import React from "react";
 import { FieldErrors, Control } from "react-hook-form";
-import { CreateItemPayload } from "../../../../types/itemTypes";
+import { CreateItemPayload } from "../../../types/itemTypes";
 import { RHFTextField } from "./RHFTextField";
 
-interface AutoFieldsProps {
+interface ServiceFieldsProps {
   control: Control<CreateItemPayload>;
   errors: FieldErrors<CreateItemPayload>;
 }
 
-export const AutoFields: React.FC<AutoFieldsProps> = ({ control }) => (
+export const ServiceFields: React.FC<ServiceFieldsProps> = ({ control }) => (
   <>
     <RHFTextField
-      name="brand"
+      name="serviceType"
       control={control}
-      label="Марка"
+      label="Тип услуги"
       variant="outlined"
       fullWidth
       style={{ marginBottom: 16 }}
-      rules={{ required: "Укажите марку" }}
+      rules={{ required: "Укажите тип услуги" }}
     />
     <RHFTextField
-      name="model"
+      name="experience"
       control={control}
-      label="Модель"
-      variant="outlined"
-      fullWidth
-      style={{ marginBottom: 16 }}
-      rules={{ required: "Укажите модель" }}
-    />
-    <RHFTextField
-      name="year"
-      control={control}
-      label="Год выпуска"
+      label="Опыт работы (лет)"
       variant="outlined"
       type="number"
       fullWidth
       style={{ marginBottom: 16 }}
-      rules={{ required: "Укажите год выпуска" }}
+      rules={{ required: "Укажите опыт (лет)" }}
     />
     <RHFTextField
-      name="mileage"
+      name="cost"
       control={control}
-      label="Пробег (км)"
+      label="Стоимость (руб.)"
       variant="outlined"
       type="number"
+      fullWidth
+      style={{ marginBottom: 16 }}
+      rules={{ required: "Укажите стоимость" }}
+    />
+    <RHFTextField
+      name="workSchedule"
+      control={control}
+      label="График работы"
+      variant="outlined"
       fullWidth
       style={{ marginBottom: 16 }}
     />

@@ -1,6 +1,6 @@
 import React from "react";
 import { FieldErrors, Control } from "react-hook-form";
-import { CreateItemPayload } from "../../../../types/itemTypes";
+import { CreateItemPayload } from "../../../types/itemTypes";
 import { RHFTextField } from "./RHFTextField";
 
 interface RealEstateFieldsProps {

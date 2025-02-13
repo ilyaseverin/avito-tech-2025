@@ -1,7 +1,7 @@
 import React from "react";
 import { Controller, Control, FieldErrors } from "react-hook-form";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { CreateItemPayload } from "../../../../types/itemTypes";
+import { CreateItemPayload } from "../../../types/itemTypes";
 import { RHFTextField } from "./RHFTextField";
 
 interface BasicFieldsProps {

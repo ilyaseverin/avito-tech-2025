@@ -7,8 +7,8 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import { useAppDispatch } from "../../../hooks/hooks";
-import { setToken } from "../../auth/authSlice";
+import { useAppDispatch } from "../../hooks/hooks";
+import { setToken } from "../auth/authSlice";
 
 interface AuthDialogProps {
   open: boolean;

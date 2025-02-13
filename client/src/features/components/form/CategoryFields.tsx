@@ -1,6 +1,6 @@
 import React from "react";
 import { Control, FieldErrors } from "react-hook-form";
-import { CreateItemPayload } from "../../../../types/itemTypes";
+import { CreateItemPayload } from "../../../types/itemTypes";
 import { RealEstateFields } from "./RealEstateFields";
 import { AutoFields } from "./AutoFields";
 import { ServiceFields } from "./ServiceFields";

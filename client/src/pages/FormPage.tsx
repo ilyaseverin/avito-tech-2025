@@ -9,9 +9,11 @@ import {
   useUpdateItemMutation,
 } from "../app/api/api";
 import { CreateItemPayload, Item } from "../types/itemTypes";
-import { BasicFields } from "../features/items/components/form/BasicFields";
-import { CategoryFields } from "../features/items/components/form/CategoryFields";
-import { StepNavigation } from "../features/items/components/form/StepNavigation";
+import { BasicFields } from "../features/components/form/BasicFields";
+import { CategoryFields } from "../features/components/form/CategoryFields";
+import { StepNavigation } from "../features/components/form/StepNavigation";
+import { ErrorDialog } from "../features/components/ErrorDialog";
+import { useDraft } from "../hooks/useDraft";
 
 export const FormPage: React.FC = () => {
   const { id } = useParams();
@@ -29,6 +31,12 @@ export const FormPage: React.FC = () => {
 
   // Шаги: 0 – основные поля, 1 – поля категории
   const [activeStep, setActiveStep] = useState(0);
+
+  // Управления модалкой ошибки
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
 
   // Инициализация формы
   const {
@@ -63,61 +71,37 @@ export const FormPage: React.FC = () => {
   // Следим за выбранной категорией
   const selectedType = watch("type");
 
-  // При редактировании — подставляем данные в форму
+  // Используем хук для черновика
+  const { clearDraft } = useDraft(isEditMode, watch, setValue);
+
+  // Подставляем данные при редактировании
   useEffect(() => {
     if (existingItem) {
-      (Object.keys(existingItem) as (keyof Item)[]).forEach((key) => {
-        if (key === "id") return;
-        if (key === "type") {
-          setValue("type", existingItem.type ?? "");
-        } else {
-          setValue(key, existingItem[key]);
+      Object.keys(existingItem).forEach((key) => {
+        if (key !== "id") {
+          setValue(
+            key as keyof CreateItemPayload,
+            existingItem[key as keyof Item]
+          );
         }
       });
     }
   }, [existingItem, setValue]);
 
-  // Загрузка черновика, если не редактируем
-  useEffect(() => {
-    if (!isEditMode) {
-      const draft = localStorage.getItem("itemDraft");
-      if (draft) {
-        const parsed = JSON.parse(draft);
-        (Object.keys(parsed) as (keyof CreateItemPayload)[]).forEach((key) => {
-          setValue(key, parsed[key]);
-        });
-      }
-    }
-  }, [isEditMode, setValue]);
-
-  // Сохранение черновика при изменениях
-  useEffect(() => {
-    const subscription = watch((values) => {
-      if (!isEditMode) {
-        localStorage.setItem("itemDraft", JSON.stringify(values));
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch, isEditMode]);
-
   // Финальный сабмит
   const onSubmit: SubmitHandler<CreateItemPayload> = async (formData) => {
     try {
       if (isEditMode) {
-        await updateItem({
-          id: Number(id),
-          data: { ...formData, type: formData.type as Item["type"] },
-        }).unwrap();
+        await updateItem({ id: Number(id), data: formData }).unwrap();
       } else {
-        await createItem({
-          ...formData,
-          type: formData.type as Item["type"],
-        }).unwrap();
-        localStorage.removeItem("itemDraft");
+        await createItem(formData).unwrap();
+        clearDraft(); // ✅ Очищаем черновик после успешного создания
       }
       navigate("/list");
     } catch (error) {
       console.error("Ошибка при сохранении:", error);
+      setErrorMessage("Ошибка при сохранении объявления. Попробуйте позже.");
+      setErrorDialogOpen(true);
     }
   };
 
@@ -140,37 +124,47 @@ export const FormPage: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
-      <h2>
-        {isEditMode ? "Редактирование объявления" : "Разместить объявление"}
-      </h2>
+    <>
+      <div style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
+        <h2>
+          {isEditMode ? "Редактирование объявления" : "Разместить объявление"}
+        </h2>
 
-      <Stepper activeStep={activeStep} style={{ marginBottom: 16 }}>
-        <Step>
-          <StepLabel>Шаг 1</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Шаг 2</StepLabel>
-        </Step>
-      </Stepper>
+        <Stepper activeStep={activeStep} style={{ marginBottom: 16 }}>
+          <Step>
+            <StepLabel>Шаг 1</StepLabel>
+          </Step>
+          <Step>
+            <StepLabel>Шаг 2</StepLabel>
+          </Step>
+        </Stepper>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {activeStep === 0 && <BasicFields control={control} errors={errors} />}
-        {activeStep === 1 && (
-          <CategoryFields
-            control={control}
-            errors={errors}
-            selectedType={selectedType}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {activeStep === 0 && (
+            <BasicFields control={control} errors={errors} />
+          )}
+          {activeStep === 1 && (
+            <CategoryFields
+              control={control}
+              errors={errors}
+              selectedType={selectedType}
+            />
+          )}
+
+          <StepNavigation
+            activeStep={activeStep}
+            handleNextStep={handleNextStep}
+            handlePrevStep={handlePrevStep}
+            handleSubmit={handleSubmit(onSubmit)}
           />
-        )}
-
-        <StepNavigation
-          activeStep={activeStep}
-          handleNextStep={handleNextStep}
-          handlePrevStep={handlePrevStep}
-          handleSubmit={handleSubmit(onSubmit)}
-        />
-      </form>
-    </div>
+        </form>
+      </div>
+      <ErrorDialog
+        open={errorDialogOpen}
+        onClose={() => setErrorDialogOpen(false)}
+        message={errorMessage}
+        title="Ошибка при сохранении"
+      />
+    </>
   );
 };

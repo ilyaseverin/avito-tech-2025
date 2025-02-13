@@ -10,8 +10,11 @@ import {
   DialogContentText,
   Box,
 } from "@mui/material";
-import { ItemDetails } from "../features/items/components/ItemDetails";
+import { ItemDetails } from "../features/components/items/ItemDetails";
 import { useAppSelector } from "../hooks/hooks";
+import { Loader } from "../features/components/Loader";
+import { ErrorMessage } from "../features/components/ErrorMessage";
+import { ErrorDialog } from "../features/components/ErrorDialog";
 
 export const ItemPage: React.FC = () => {
   const { id } = useParams();
@@ -32,8 +35,18 @@ export const ItemPage: React.FC = () => {
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  if (isLoading) return <div>Загрузка...</div>;
-  if (error || !item) return <div>Ошибка или объявление не найдено</div>;
+  if (isLoading) return <Loader />;
+
+  if (error || !item) {
+    const errorMessage = "Не удалось загрузить объявление.";
+    let errorCode: number | undefined;
+
+    if (typeof error === "object" && error !== null && "status" in error) {
+      errorCode = (error as { status: number }).status;
+    }
+
+    return <ErrorMessage message={errorMessage} code={errorCode} />;
+  }
 
   // Подтверждение удаления
   const handleOpenDeleteConfirm = () => {
@@ -136,19 +149,12 @@ export const ItemPage: React.FC = () => {
       </Dialog>
 
       {/* Модальное окно ошибки при удалении */}
-      <Dialog open={errorDialogOpen} onClose={handleCloseErrorDialog}>
-        <DialogTitle>Ошибка при удалении</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {errorMessage || "Произошла неизвестная ошибка"}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseErrorDialog} autoFocus>
-            Закрыть
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ErrorDialog
+        open={errorDialogOpen}
+        onClose={handleCloseErrorDialog}
+        message={errorMessage}
+        title="Ошибка при сохранении"
+      />
     </>
   );
 };

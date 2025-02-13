@@ -2,26 +2,25 @@ import React, { useState } from "react";
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { clearToken } from "../features/auth/authSlice";
-import { AuthDialog } from "../features/items/components/AuthDialog";
+import { AuthDialog } from "../features/components/AuthDialog";
+import { useNavigate } from "react-router-dom";
 
 export const Header: React.FC = () => {
+  const navigate = useNavigate();
   // Берём token из store
   const token = useAppSelector((state) => state.auth.token);
   const dispatch = useAppDispatch();
 
-  // Управляем видимостью диалога
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
-  // Открыть модалку логина
   const handleOpenAuthDialog = () => {
     setAuthDialogOpen(true);
   };
-  // Закрыть модалку
+
   const handleCloseAuthDialog = () => {
     setAuthDialogOpen(false);
   };
 
-  // Выход
   const handleLogout = () => {
     dispatch(clearToken());
   };
@@ -30,7 +29,12 @@ export const Header: React.FC = () => {
     <>
       <AppBar position="static">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="h6" component="div">
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ cursor: "pointer", userSelect: "none" }}
+            onClick={() => navigate("/list")}
+          >
             Avito-tech
           </Typography>
 
@@ -46,7 +50,6 @@ export const Header: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Модальное окно логина */}
       <AuthDialog open={authDialogOpen} onClose={handleCloseAuthDialog} />
     </>
   );
