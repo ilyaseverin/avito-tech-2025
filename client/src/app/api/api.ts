@@ -16,7 +16,7 @@ export const itemsApi = createApi({
     }),
     getItemById: builder.query<Item, number>({
       query: (id) => `/items/${id}`,
-      providesTags: (result, error, id) => [{ type: "Items", id }],
+      providesTags: (_result, _error, id) => [{ type: "Items", id }],
     }),
     createItem: builder.mutation<Item, CreateItemPayload>({
       query: (body) => ({
@@ -35,7 +35,7 @@ export const itemsApi = createApi({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "Items", id }],
+      invalidatesTags: (_result, _error, { id }) => [{ type: "Items", id }],
     }),
     deleteItem: builder.mutation<null, number>({
       query: (id) => ({
