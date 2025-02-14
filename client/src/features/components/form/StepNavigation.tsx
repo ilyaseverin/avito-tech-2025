@@ -1,13 +1,46 @@
+/**
+ * `StepNavigation` — компонент навигации по шагам формы.
+ * Используется в многошаговой форме создания объявления.
+ */
+
 import React from "react";
 import { Button, Box, Stack } from "@mui/material";
 
+/**
+ * Интерфейс пропсов для `StepNavigation`.
+ */
 interface StepNavigationProps {
+  /**
+   * Текущий активный шаг формы.
+   */
   activeStep: number;
+
+  /**
+   * Обработчик перехода к следующему шагу.
+   */
   handleNextStep: () => void;
+
+  /**
+   * Обработчик возврата к предыдущему шагу.
+   */
   handlePrevStep: () => void;
+
+  /**
+   * Обработчик отправки формы.
+   */
   handleSubmit: () => void;
 }
 
+/**
+ * `StepNavigation` — компонент управления шагами формы.
+ * В зависимости от текущего шага отображает кнопки "Далее", "Назад" и "Сохранить".
+ *
+ * @param activeStep Текущий шаг
+ * @param handleNextStep Функция перехода к следующему шагу
+ * @param handlePrevStep Функция возврата к предыдущему шагу
+ * @param handleSubmit Функция отправки формы
+ * @returns JSX-элементы кнопок управления
+ */
 export const StepNavigation: React.FC<StepNavigationProps> = ({
   activeStep,
   handleNextStep,

@@ -1,14 +1,44 @@
+/**
+ * Компонент BasicFields предназначен для ввода базовых данных объявления.
+ * Используется в формах создания/редактирования объявления.
+ *
+ * Включает следующие поля:
+ * - Название (name) - обязательное поле
+ * - Описание (description) - обязательное поле
+ * - Локация (location) - обязательное поле
+ * - Ссылка на фото (image) - необязательное поле
+ * - Категория (type) - обязательное поле (выбор из списка)
+ *
+ * Компонент интегрирован с `react-hook-form` для управления формой и валидацией.
+ */
+
 import React from "react";
 import { Controller, Control, FieldErrors } from "react-hook-form";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { CreateItemPayload } from "../../../types/itemTypes";
 import { RHFTextField } from "./RHFTextField";
 
+/**
+ * Интерфейс пропсов для BasicFields.
+ */
 interface BasicFieldsProps {
+  /**
+   * Контроль управления формой от `react-hook-form`.
+   */
   control: Control<CreateItemPayload>;
+
+  /**
+   * Ошибки валидации полей формы.
+   */
   errors: FieldErrors<CreateItemPayload>;
 }
 
+/**
+ * Компонент для ввода основных данных объявления.
+ * @param control Контроллер формы для управления полями
+ * @param errors Ошибки валидации полей формы
+ * @returns JSX-элементы полей ввода
+ */
 export const BasicFields: React.FC<BasicFieldsProps> = ({
   control,
   errors,
@@ -54,6 +84,7 @@ export const BasicFields: React.FC<BasicFieldsProps> = ({
         style={{ marginBottom: 16 }}
       />
 
+      {/* Поле выбора категории */}
       <FormControl variant="outlined" fullWidth style={{ marginBottom: 16 }}>
         <InputLabel id="type-label">Категория</InputLabel>
         <Controller

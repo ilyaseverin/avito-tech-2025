@@ -1,3 +1,13 @@
+/**
+ * `FormPage.tsx` — страница создания и редактирования объявления.
+ *
+ * Этот компонент содержит многошаговую форму, которая позволяет пользователям
+ * добавлять или редактировать объявления, заполняя основные поля и информацию,
+ * специфичную для выбранной категории (недвижимость, авто, услуги).
+ *
+ * @module FormPage
+ */
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -23,30 +33,31 @@ import { StepNavigation } from "../features/components/form/StepNavigation";
 import { ErrorDialog } from "../features/components/ErrorDialog";
 import { useDraft } from "../hooks/useDraft";
 
+/**
+ * Основной компонент формы для создания или редактирования объявления.
+ */
 export const FormPage: React.FC = () => {
   const { id } = useParams();
-  const isEditMode = Boolean(id);
+  const isEditMode = Boolean(id); // Флаг режима редактирования
   const navigate = useNavigate();
 
-  // Получаем данные для редактирования (если есть)
+  // Получаем данные объявления, если редактируем существующее
   const { data: existingItem } = useGetItemByIdQuery(Number(id), {
-    skip: !isEditMode,
+    skip: !isEditMode, // Запрос выполняется только в режиме редактирования
   });
 
-  // RTK Query: мутации
+  // RTK Query: API-мутации для создания и обновления объявления
   const [createItem] = useCreateItemMutation();
   const [updateItem] = useUpdateItemMutation();
 
-  // Шаги: 0 – основные поля, 1 – поля категории
+  // Управление шагами формы
   const [activeStep, setActiveStep] = useState(0);
 
-  // Управления модалкой ошибки
+  // Управление состоянием модального окна ошибки
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    undefined
-  );
+  const [errorMessage, setErrorMessage] = useState<string | undefined>();
 
-  // Инициализация формы
+  // Инициализация формы с `react-hook-form`
   const {
     control,
     handleSubmit,
@@ -76,13 +87,15 @@ export const FormPage: React.FC = () => {
     },
   });
 
-  // Следим за выбранной категорией
+  // Следим за изменением категории объявления
   const selectedType = watch("type");
 
-  // Используем хук для черновика
+  // Используем хук для работы с черновиком (autosave в localStorage)
   const { clearDraft } = useDraft(isEditMode, watch, setValue);
 
-  // Подставляем данные при редактировании
+  /**
+   * Подставляет данные в форму при редактировании существующего объявления.
+   */
   useEffect(() => {
     if (existingItem) {
       Object.keys(existingItem).forEach((key) => {
@@ -96,16 +109,18 @@ export const FormPage: React.FC = () => {
     }
   }, [existingItem, setValue]);
 
-  // Финальный сабмит
+  /**
+   * Финальная отправка формы (создание или обновление объявления).
+   */
   const onSubmit: SubmitHandler<CreateItemPayload> = async (formData) => {
     try {
       if (isEditMode) {
         await updateItem({ id: Number(id), data: formData }).unwrap();
       } else {
         await createItem(formData).unwrap();
-        clearDraft();
+        clearDraft(); // Удаляем черновик после успешного создания
       }
-      navigate("/list");
+      navigate("/list"); // Перенаправление на список объявлений
     } catch (error) {
       console.error("Ошибка при сохранении:", error);
       setErrorMessage("Ошибка при сохранении объявления. Попробуйте позже.");
@@ -113,7 +128,9 @@ export const FormPage: React.FC = () => {
     }
   };
 
-  // Переход на второй шаг (валидация шаг 1)
+  /**
+   * Обработчик перехода на следующий шаг (валидация перед переходом).
+   */
   const handleNextStep = async () => {
     const isStep1Valid = await trigger([
       "name",
@@ -127,6 +144,9 @@ export const FormPage: React.FC = () => {
     }
   };
 
+  /**
+   * Обработчик перехода на предыдущий шаг.
+   */
   const handlePrevStep = () => {
     setActiveStep(0);
   };
@@ -139,6 +159,7 @@ export const FormPage: React.FC = () => {
             {isEditMode ? "Редактирование объявления" : "Разместить объявление"}
           </Typography>
 
+          {/* Многошаговый процесс (Stepper) */}
           <Box sx={{ mb: 2 }}>
             <Stepper activeStep={activeStep}>
               <Step>
@@ -150,6 +171,7 @@ export const FormPage: React.FC = () => {
             </Stepper>
           </Box>
 
+          {/* Форма с динамическим рендерингом шагов */}
           <form onSubmit={handleSubmit(onSubmit)}>
             {activeStep === 0 && (
               <BasicFields control={control} errors={errors} />
@@ -162,6 +184,7 @@ export const FormPage: React.FC = () => {
               />
             )}
 
+            {/* Кнопки навигации между шагами */}
             <StepNavigation
               activeStep={activeStep}
               handleNextStep={handleNextStep}
@@ -172,6 +195,7 @@ export const FormPage: React.FC = () => {
         </Paper>
       </Container>
 
+      {/* Диалог ошибки */}
       <ErrorDialog
         open={errorDialogOpen}
         onClose={() => setErrorDialogOpen(false)}

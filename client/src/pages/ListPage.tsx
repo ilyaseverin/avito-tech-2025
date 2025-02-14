@@ -1,3 +1,12 @@
+/**
+ * `ListPage.tsx` — страница со списком объявлений.
+ *
+ * Этот компонент загружает список объявлений, позволяет фильтровать их по категориям
+ * и названию, а также поддерживает пагинацию.
+ *
+ * @module ListPage
+ */
+
 import React, { useState } from "react";
 import { useGetItemsQuery } from "../app/api/api";
 import {
@@ -21,23 +30,29 @@ import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied
 import { ItemCard } from "../features/components/items/ItemCard";
 import { Item } from "../types/itemTypes";
 import { useDebounce } from "../hooks/useDebounce";
-import { useAppSelector } from "../hooks/hooks";
+import { useAppSelector } from "../hooks/reduxHooks";
 import { Loader } from "../features/components/Loader";
 import { ErrorMessage } from "../features/components/ErrorMessage";
 
+/**
+ * Компонент страницы списка объявлений.
+ */
 export const ListPage: React.FC = () => {
   const { data: items = [], isLoading, error } = useGetItemsQuery();
   const token = useAppSelector((state) => state.auth.token);
-  // Поиск
+
+  // Управление состоянием фильтрации и поиска
   const [search, setSearch] = useState("");
-  // Фильтр категории
   const [category, setCategory] = useState("");
-  // Текущая страница
   const [page, setPage] = useState(1);
 
+  // Дебаунс для оптимизации поиска
   const debouncedSearch = useDebounce(search, 500);
 
-  // Фильтруем items по поиску и категории
+  /**
+   * Фильтрация объявлений по названию и категории.
+   * Поиск начинается только после ввода 3 и более символов.
+   */
   const filteredItems = items
     .filter((item) =>
       debouncedSearch.length >= 3
@@ -73,6 +88,8 @@ export const ListPage: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Список объявлений
       </Typography>
+
+      {/* Поисковая строка и фильтр */}
       <Box
         sx={{
           display: "flex",
@@ -83,19 +100,19 @@ export const ListPage: React.FC = () => {
           my: 4,
         }}
       >
-        {/* Если есть token, отображаем кнопку */}
+        {/* Кнопка размещения объявления (доступна только авторизованным пользователям) */}
         {token && (
           <Button variant="contained" href="/form">
             Разместить объявление
           </Button>
         )}
 
-        {/* Группа для поиска и фильтра */}
+        {/* Группа поиска и фильтрации */}
         <Box
           sx={{
             display: "flex",
             gap: 2,
-            flexWrap: "wrap", // если места мало — элементы переносятся
+            flexWrap: "wrap",
             justifyContent: "center",
           }}
         >
@@ -133,7 +150,8 @@ export const ListPage: React.FC = () => {
           </FormControl>
         </Box>
       </Box>
-      {/* Если нет результатов, показываем заглушку */}
+
+      {/* Если нет объявлений, показываем заглушку */}
       {filteredItems.length === 0 ? (
         <Paper
           sx={{

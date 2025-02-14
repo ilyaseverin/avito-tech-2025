@@ -1,12 +1,21 @@
+/**
+ * `ItemDetails` — компонент для отображения детальной информации об объявлении.
+ *
+ * @param item Объект объявления, содержащий основные данные, такие как название, изображение, описание,
+ *             локация, категория, а также дополнительные характеристики в зависимости от категории объявления.
+ */
+
 import React from "react";
 import { Item } from "../../../types/itemTypes";
 import { Box, Container, Grid2, Typography } from "@mui/material";
 
-interface ItemDetailsProps {
-  item: Item;
-}
-
-export const ItemDetails: React.FC<ItemDetailsProps> = ({ item }) => {
+/**
+ * `ItemDetails` — компонент отображения подробной информации об объекте.
+ *
+ * @param {Item} item - Данные объявления.
+ * @returns {JSX.Element} Разметка детальной информации о товаре/услуге.
+ */
+export const ItemDetails: React.FC<{ item: Item }> = ({ item }) => {
   return (
     <Box sx={{ width: "100%", backgroundColor: "#fff", py: 4 }}>
       <Container maxWidth="lg">

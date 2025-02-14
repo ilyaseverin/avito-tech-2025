@@ -1,3 +1,19 @@
+/**
+ * `useDraft.ts` — хук для сохранения черновика формы в `localStorage`.
+ *
+ * Этот хук автоматически загружает черновик данных при монтировании
+ * (если не редактируется существующая запись), следит за изменениями формы
+ * и сохраняет их в `localStorage`, а также предоставляет функцию очистки черновика.
+ *
+ * @param {boolean} isEditMode - Флаг, указывающий, редактируется ли существующий объект.
+ * @param {UseFormWatch<CreateItemPayload>} watch - Функция для отслеживания изменений формы.
+ * @param {UseFormSetValue<CreateItemPayload>} setValue - Функция для установки значений полей формы.
+ * @returns {Object} Объект с функцией `clearDraft`, которая удаляет черновик из `localStorage`.
+ *
+ * @example
+ * const { clearDraft } = useDraft(isEditMode, watch, setValue);
+ */
+
 import { useEffect } from "react";
 import { UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { CreateItemPayload } from "../types/itemTypes";
@@ -9,7 +25,7 @@ export const useDraft = (
   watch: UseFormWatch<CreateItemPayload>,
   setValue: UseFormSetValue<CreateItemPayload>
 ) => {
-  // Загрузка черновика при монтировании (если не редактируем)
+  // Загружаем черновик из localStorage при монтировании (если это не режим редактирования)
   useEffect(() => {
     if (!isEditMode) {
       const draft = localStorage.getItem(DRAFT_KEY);
@@ -26,7 +42,7 @@ export const useDraft = (
     }
   }, [isEditMode, setValue]);
 
-  // Сохранение черновика при изменениях формы
+  // Автоматическое сохранение черновика при изменении значений формы
   useEffect(() => {
     const subscription = watch((values) => {
       if (!isEditMode) {
@@ -37,7 +53,7 @@ export const useDraft = (
     return () => subscription.unsubscribe();
   }, [watch, isEditMode]);
 
-  // Очистка черновика
+  // Функция очистки черновика
   const clearDraft = () => {
     localStorage.removeItem(DRAFT_KEY);
   };

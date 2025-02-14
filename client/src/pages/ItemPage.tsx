@@ -1,3 +1,12 @@
+/**
+ * `ItemPage.tsx` — страница просмотра деталей объявления.
+ *
+ * Этот компонент загружает данные об объявлении по его ID, аутентифицирует пользователя
+ * и предоставляет возможность редактирования или удаления объявления.
+ *
+ * @module ItemPage
+ */
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetItemByIdQuery, useDeleteItemMutation } from "../app/api/api";
@@ -11,11 +20,14 @@ import {
   Box,
 } from "@mui/material";
 import { ItemDetails } from "../features/components/items/ItemDetails";
-import { useAppSelector } from "../hooks/hooks";
+import { useAppSelector } from "../hooks/reduxHooks";
 import { Loader } from "../features/components/Loader";
 import { ErrorMessage } from "../features/components/ErrorMessage";
 import { ErrorDialog } from "../features/components/ErrorDialog";
 
+/**
+ * Компонент страницы с деталями объявления.
+ */
 export const ItemPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -25,18 +37,21 @@ export const ItemPage: React.FC = () => {
   // Запрашиваем данные объявления
   const { data: item, isLoading, error } = useGetItemByIdQuery(itemId);
 
+  // Получаем токен пользователя (для проверки авторизации)
   const token = useAppSelector((state) => state.auth.token);
 
-  // Мутация на удаление
+  // Мутация удаления объявления
   const [deleteItem] = useDeleteItemMutation();
 
-  // Состояние для модалок
+  // Состояния для модальных окон
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Отображение загрузчика, если данные еще загружаются
   if (isLoading) return <Loader />;
 
+  // Отображение ошибки, если данные не загружены
   if (error || !item) {
     const errorMessage = "Не удалось загрузить объявление.";
     let errorCode: number | undefined;
@@ -48,20 +63,28 @@ export const ItemPage: React.FC = () => {
     return <ErrorMessage message={errorMessage} code={errorCode} />;
   }
 
-  // Подтверждение удаления
+  /**
+   * Открытие диалогового окна подтверждения удаления.
+   */
   const handleOpenDeleteConfirm = () => {
     setConfirmDeleteOpen(true);
   };
+
+  /**
+   * Закрытие диалогового окна подтверждения удаления.
+   */
   const handleCloseDeleteConfirm = () => {
     setConfirmDeleteOpen(false);
   };
 
-  // Собственно удаление
+  /**
+   * Удаление объявления с подтверждением.
+   */
   const handleConfirmDelete = async () => {
     try {
       await deleteItem(itemId).unwrap();
       setConfirmDeleteOpen(false);
-      navigate("/list");
+      navigate("/list"); // Перенаправление на список объявлений после удаления
     } catch (err: unknown) {
       setConfirmDeleteOpen(false);
 
@@ -80,23 +103,27 @@ export const ItemPage: React.FC = () => {
     }
   };
 
-  // Закрыть окно ошибки
+  /**
+   * Закрытие диалогового окна ошибки.
+   */
   const handleCloseErrorDialog = () => {
     setErrorDialogOpen(false);
     setErrorMessage("");
   };
 
-  // Кнопка «Назад»
+  /**
+   * Кнопка "Назад" для возврата на предыдущую страницу.
+   */
   const handleGoBack = () => {
     navigate(-1);
   };
 
   return (
     <>
-      {/* Детали объявления */}
+      {/* Детальная информация об объявлении */}
       <ItemDetails item={item} />
 
-      {/* Кнопки управления (доступны только если авторизован) */}
+      {/* Кнопки управления (доступны только авторизованным пользователям) */}
       {token && (
         <Box
           sx={{
@@ -128,7 +155,7 @@ export const ItemPage: React.FC = () => {
         </Box>
       )}
 
-      {/* Модальное окно подтверждения удаления */}
+      {/* Диалоговое окно подтверждения удаления */}
       <Dialog open={confirmDeleteOpen} onClose={handleCloseDeleteConfirm}>
         <DialogTitle>Удалить объявление?</DialogTitle>
         <DialogContent>
@@ -148,12 +175,12 @@ export const ItemPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Модальное окно ошибки при удалении */}
+      {/* Диалоговое окно ошибки при удалении */}
       <ErrorDialog
         open={errorDialogOpen}
         onClose={handleCloseErrorDialog}
         message={errorMessage}
-        title="Ошибка при сохранении"
+        title="Ошибка при удалении"
       />
     </>
   );

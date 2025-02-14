@@ -1,3 +1,10 @@
+/**
+ * `AuthDialog` — модальное окно для авторизации пользователей.
+ *
+ * Компонент отображает форму входа, используя `react-hook-form` для управления
+ * вводом данных и валидацией, а также Redux Toolkit для управления состоянием авторизации.
+ */
+
 import React from "react";
 import {
   Dialog,
@@ -7,23 +14,32 @@ import {
   Button,
 } from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useAppDispatch } from "../../hooks/hooks";
+import { useAppDispatch } from "../../hooks/reduxHooks";
 import { setToken } from "../auth/authSlice";
 import { RHFTextField } from "../components/form/RHFTextField";
 
+// Свойства компонента `AuthDialog`
 interface AuthDialogProps {
-  open: boolean;
-  onClose: () => void;
+  open: boolean; // Флаг открытия модального окна
+  onClose: () => void; // Функция закрытия окна
 }
 
+// Интерфейс формы авторизации
 interface AuthFormValues {
-  username: string;
-  password: string;
+  username: string; // Поле для ввода логина
+  password: string; // Поле для ввода пароля
 }
 
+/**
+ * `AuthDialog` — модальное окно входа в систему.
+ *
+ * @param open Флаг отображения модального окна.
+ * @param onClose Функция для закрытия модального окна.
+ */
 export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onClose }) => {
   const dispatch = useAppDispatch();
 
+  // Инициализация формы с react-hook-form
   const { control, handleSubmit, setError, reset } = useForm<AuthFormValues>({
     defaultValues: {
       username: "",
@@ -31,9 +47,13 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onClose }) => {
     },
   });
 
+  /**
+   * Обработчик отправки формы.
+   * Если введены корректные данные, устанавливается токен, иначе показывается ошибка.
+   */
   const onSubmit: SubmitHandler<AuthFormValues> = (data) => {
     if (data.username === "test" && data.password === "1234") {
-      dispatch(setToken("fake-token"));
+      dispatch(setToken("fake-token")); // Устанавливаем тестовый токен
       handleClose();
     } else {
       setError("username", {
@@ -47,6 +67,9 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onClose }) => {
     }
   };
 
+  /**
+   * Функция закрытия модального окна, очищающая данные формы.
+   */
   const handleClose = () => {
     reset();
     onClose();

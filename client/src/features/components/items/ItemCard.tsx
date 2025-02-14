@@ -1,3 +1,8 @@
+/**
+ * `ItemCard` — карточка объявления.
+ * Отображает изображение, название, местоположение, категорию и кнопку "Открыть".
+ */
+
 import React from "react";
 import { Item } from "../../../types/itemTypes";
 import {
@@ -10,15 +15,27 @@ import {
   Box,
 } from "@mui/material";
 
+/**
+ * Интерфейс пропсов для `ItemCard`.
+ */
 interface ItemCardProps {
+  /**
+   * Данные объявления.
+   */
   item: Item;
 }
 
+/**
+ * `ItemCard` — карточка с данными объявления.
+ *
+ * @param item Данные объявления
+ * @returns JSX-элемент карточки объявления
+ */
 export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
   return (
     <Card
       sx={{
-        maxWidth: 350, // увеличенная максимальная ширина карточки
+        maxWidth: 350,
         margin: "auto",
         borderRadius: 2,
         boxShadow: 3,
@@ -29,13 +46,14 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
         },
       }}
     >
+      {/* Проверяем наличие изображения */}
       {item.image ? (
         <CardMedia
           component="img"
           image={item.image}
           alt={item.name}
           sx={{
-            height: 200, // увеличенная высота изображения
+            height: 200,
             objectFit: "cover",
           }}
         />
@@ -54,6 +72,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
           </Typography>
         </Box>
       )}
+
       <CardContent sx={{ textAlign: "center", p: 2 }}>
         <Typography variant="subtitle1" gutterBottom>
           {item.name}
@@ -65,6 +84,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
           Категория: {item.type}
         </Typography>
       </CardContent>
+
       <CardActions sx={{ pb: 2 }}>
         <Button
           variant="contained"
