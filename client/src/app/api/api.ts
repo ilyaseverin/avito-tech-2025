@@ -7,7 +7,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Item, CreateItemPayload } from "../../types/itemTypes"; // Импорт типов данных
 
 // Получение базового URL API из переменных окружения
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 /**
  * @readonly itemsApi
